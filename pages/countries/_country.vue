@@ -41,7 +41,7 @@ export default {
       return new Date(ts).toLocaleString();
     }
   },
-  created() {
+  mounted() {
     this.getCountryTimeline();
     this.getCountryData();
   },
