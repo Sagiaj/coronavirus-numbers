@@ -1,9 +1,11 @@
 <template>
-  <v-row justify="center" v-if="breakpointSatisfied">
-    <v-col align="center">
-      <adsbygoogle />
-    </v-col>
-  </v-row>
+  <no-ssr v-if="breakpointSatisfied">
+    <v-row justify="center">
+      <v-col align="center">
+        <adsbygoogle />
+      </v-col>
+    </v-row>
+  </no-ssr>
 </template>
 
 <script>

@@ -13,3 +13,10 @@ export interface CountryTimeline {
 export interface Cases {
   [key: string]: number;
 }
+
+export interface SeriesResults {
+  country: string;
+  cases: { data: Array<any> };
+  deaths: { data: Array<any> };
+  recovered: { data: Array<any> };
+}

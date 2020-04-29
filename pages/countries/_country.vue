@@ -1,39 +1,40 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="3" align="end">
+      <v-col cols="3">
         <h1>{{ currentCountry }}</h1>
-      </v-col>
-      <v-col cols="1" align-self="center" align="start">
-        <v-img responsive small :src="countryFlag"></v-img>
+        <v-row justify="center">
+          <v-col cols="6" align-self="center">
+            <v-img responsive small :src="countryFlag"></v-img>
+          </v-col>
+        </v-row>
       </v-col>
     </v-row>
-    <SparklineGraph 
-    :caseDates="caseDates"
-    :caseValues="caseValues"
-    :lastUpdated="timestampToDate(countryData.updated)"
-    :cardTitle="`Cases over time in ${currentCountry}`"
-    subTitle="By Date" />
+    <TimeSeries
+      :providedSeries="countrySeries"
+      seriesType="Line"
+      :seriesTitle="`${currentCountry}`"
+    />
       
   </v-container>
 </template>
 
 <script>
 import { CoronaRoutes } from '../../utilities/api'
-import SparklineGraph from "~/components/SparklineGraph";
+import TimeSeries from "@/components/TimeSeries";
+import { transformTimelineToSeries } from '../../utilities/data-handlers';
+
 export default {
   name: "Country",
-  components: { SparklineGraph },
+  components: { TimeSeries },
   methods: {
     async getCountryTimeline() {
-      let { data: countryTimeline } = await this.$axios(CoronaRoutes.historical(this.currentCountry));
-      this.countryTimeline = countryTimeline.timeline;
-      const casesDates = Object.keys(this.countryTimeline.cases);
-      this.caseDates = casesDates.map((d, i) => ( (i+1) % Math.ceil(casesDates.length/4-1) ) ? ' ' : d  )
-      this.caseValues = Object.values(this.countryTimeline.cases);
+      const { data: countryTimeline } = await this.$axios(CoronaRoutes.historical(this.currentCountry));
+      const { country, ...series } = transformTimelineToSeries(countryTimeline.timeline, this.currentCountry);
+      this.countrySeries = series;
     },
     async getCountryData() {
-      let { data: countryData } = await this.$axios(CoronaRoutes.country(this.currentCountry));
+      const { data: countryData } = await this.$axios(CoronaRoutes.country(this.currentCountry));
       this.countryData = countryData;
       this.countryFlag = countryData.countryInfo ? countryData.countryInfo.flag : "";
     },
@@ -52,6 +53,7 @@ export default {
       countryData: {updated: ""},
       caseValues: [],
       caseDates: [],
+      countrySeries: [],
       countryFlag: ""
     }
   }

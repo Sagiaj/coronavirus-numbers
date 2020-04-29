@@ -1,52 +1,72 @@
 <template>
   <v-container fluid>
-    <v-row>      
+    <v-row>
       <v-col cols="4">
         <v-card style="max-height: 80vh; overflow-y: scroll;">
-          <v-card-title>
-            <h2 class="title">Click on any country to see it on the graph</h2>
-            <v-text-field
-              ref="search"
-              v-model="search"
-              full-width
-              hide-details
-              clearable
-              label="Search"
-              single-line
-              class="mb-2"
-            ></v-text-field>
-          </v-card-title>
-          <v-card-text>
-            <v-chip-group
-              v-model="countriesList"
-              column
-              multiple
-              v-if="countries.length > 0"
+          <v-container class="py-0">
+            <v-row
+              align="center"
+              justify="start"
             >
-              <v-chip v-for="(country, idx) in filteredCountries" :key="idx"
-              filter
-              outlined
-              :disabled="loadingData === true || finishedLoading === false"
-              @input="handleCountryClick(country, idx, $event)"
+              <v-col
+                v-for="(selection, i) in selections"
+                :key="selection.country"
+                class="shrink"
               >
-                <v-avatar left v-if="country && country.countryInfo">
-                  <v-img :src="country.countryInfo.flag"></v-img>
-                </v-avatar>
-              {{ country.country }}
-              </v-chip>
-            </v-chip-group>
-          </v-card-text>
+                <v-chip
+                  :disabled="loadingData"
+                  close
+                  @click:close="selected.splice(i, 1); removeCountryFromChart(selection, i);"
+                >
+                  <v-avatar left v-if="selection && selection.countryInfo">
+                    <v-img :src="selection.countryInfo.flag"></v-img>
+                  </v-avatar>
+                  {{ selection.country }}
+                </v-chip>
+              </v-col>
+
+              <v-col v-if="!allSelected" cols="12">
+                <v-text-field
+                  ref="search"
+                  v-model="search"
+                  full-width
+                  hide-details
+                  label="Search"
+                  single-line
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+
+          <v-divider v-if="!allSelected"></v-divider>
+
+          <v-list>
+            <template v-for="(item, i) in filteredCountries">
+              <v-list-item
+                v-if="!selected.includes(i)"
+                :key="i"
+                :disabled="loadingData"
+                @click="selected.push(i); addCountryToChart(item, i);"
+              >
+                <v-list-item-avatar>
+                  <v-avatar left v-if="item && item.countryInfo">
+                    <v-img :src="item.countryInfo.flag"></v-img>
+                  </v-avatar>
+                </v-list-item-avatar>
+                <v-list-item-title v-text="item.country"></v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-list>
         </v-card>        
       </v-col>
       <v-col cols="8">
+        <!-- {{comparedCountries}} -->
         <TimeSeries
-          :seriesArray="comparedCountries"
-          xName="date"
-          yName="cases"
-          seriesType="Line"
+          :providedSeries="comparedCountries.map(({ country, ...series }) => series)"
           seriesTitle="Comparison chart"
+          :externalIndicatorChoices="comparedCountries.map(c => Object.keys(c.country))"
         />
-        <v-btn color="info" class="mt-3" @click.native="clearChart" v-if="countriesList.length > 1">
+        <v-btn color="info" class="mt-3" @click.native="clearChart" v-if="selected.length > 1">
           <v-icon>mdi-delete</v-icon>
           <span>CLEAR ALL</span>
         </v-btn>
@@ -58,7 +78,7 @@
 <script>
 import { CoronaRoutes } from '../utilities/api';
 import TimeSeries from "~/components/TimeSeries";
-import { transformTimelineToSeries } from "~/utilities/data-handlers";
+import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToRateSeries } from "~/utilities/data-handlers";
 
 export default {
   name: "CompareCountries",
@@ -66,50 +86,55 @@ export default {
     TimeSeries
   },
   computed: {
-    filteredCountries() {
-      if (!this.search) return this.countries;
-      const search = this.search.toLowerCase();
+    filteredCountries () {
+      return findWordsByPrefix(this.countriesTrie, this.search).map((v) => v.context);
+    },
+    selections () {
+      const selections = [];
 
-      if (!search || search.length < 1) return this.countries;
+      for (const selection of this.selected) {
+        selections.push(this.countries[selection])
+      }
 
-      return this.countries.filter(item => {
-        const text = item.country.toLowerCase();
-
-        return text.indexOf(search) > -1;
-      });
+      return selections;
+    },
+    allSelected () {
+      return this.selected.length === this.countries.length;
     }
   },
   methods: {
-    clearChart(event) {
+    clearChart (event) {
       this.search = '';
-      this.countriesList = [];
+      this.selected = [];
       this.comparedCountries = [];
     },
     async getCountriesData() {
       this.startFetching();
       let { data: countries } = await this.$axios(CoronaRoutes.sortCountries());
+      this.countriesTrie = parseStructureToTrie(countries, 'country');
       this.countries = countries;
       this.finishFetching();
     },
-    async getCountryTimeline(country) {
+    async getCountryTimeline(country) {      
       let { data: countryTimeline } = await this.$axios(CoronaRoutes.historical(country));
-      return countryTimeline.timeline;
+      return countryTimeline;
     },
-    handleCountryClick(country, idx, active) {
-      if (!active) { this.removeCountryFromChart(country) }
-      else { this.addCountryToChart(country, idx); }
+    removeTimeSeries(item, i) {
+      this.comparedCountries.splice(i, 1);
     },
     async addCountryToChart(country, idx) {
+      this.startFetching();
       const countryTimeline = await this.getCountryTimeline(country.country);
-      const countrySeries = transformTimelineToSeries(countryTimeline, country.country);
-      this.comparedCountries.push(countrySeries);
+      const series = transformTimelineToSeries(countryTimeline.timeline, country);
+      console.log("returning this series:", series);
+      // keys should be countries
+      // series[country].data = [{date: "/d..", prop: ""}]
+      // let rate = transformTimelineToRateSeries(countryTimeline, country.country);
+      this.comparedCountries.splice(idx, 0, series);
+      this.finishFetching();
     },
-    removeCountryFromChart(country) {
-      let foundIdx = this.comparedCountries.findIndex(c => c.country == country.country)
-      if (foundIdx !== -1) this.comparedCountries.splice(foundIdx, 1);      
-    },
-    timestampToDate(ts) {
-      return new Date(ts).toLocaleString();
+    removeCountryFromChart(country, idx) {
+      this.comparedCountries.splice(idx, 1);
     },
     startFetching() {
       this.fetchersQueue++;
@@ -141,7 +166,11 @@ export default {
       loadingData: false,
       finishedLoading: true,
       countriesList: [],
-      search: ""
+      search: "",
+      countriesTrie: [],
+      selected: [],
+      comparisonModel: "",
+      labelFormat: "y%"
     }
   }
 }

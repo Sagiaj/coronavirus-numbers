@@ -77,6 +77,10 @@ dist
 # Serverless directories
 .serverless
 
+# js & .map files
+**/*.js
+**/*.map.js
+
 # IDE / Editor
 .idea
 
