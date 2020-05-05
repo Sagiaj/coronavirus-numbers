@@ -1,11 +1,11 @@
 <template>
-  <no-ssr v-if="breakpointSatisfied">
+  <client-only v-if="breakpointSatisfied">
     <v-row justify="center">
       <v-col align="center">
         <adsbygoogle />
       </v-col>
     </v-row>
-  </no-ssr>
+  </client-only>
 </template>
 
 <script>

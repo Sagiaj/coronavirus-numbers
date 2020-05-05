@@ -5,9 +5,7 @@
       <v-row justify="center">
         <v-col 
           cols="12"
-          md="10"
-          lg="8"
-          xl="7"
+          lg="10"
           align="center"
           align-self="center">
           <nuxt />
@@ -23,6 +21,7 @@ import Header from "@/components/partials/Header";
 import Footer from "@/components/partials/Footer";
 
 export default {
+  name: "default",
   components: { Header, Footer }
 }
 </script>

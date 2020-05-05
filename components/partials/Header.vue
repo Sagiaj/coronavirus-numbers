@@ -3,7 +3,7 @@
         <v-app-bar app>
             <v-toolbar-title>
                 <nuxt-link to="/" tag="span" style="cursor: pointer">
-                {{ title }}
+                <v-icon>mdi-home</v-icon>
                 </nuxt-link>
             </v-toolbar-title>
             <v-spacer />
@@ -29,11 +29,15 @@ export default {
             items: [
                 {
                     icon: 'mdi-chart-bubble',
+                    title: 'Corona numbers',
+                    to: '/'
+                },
+                {
+                    icon: 'mdi-chart-bubble',
                     title: 'Compare countries',
                     to: '/compare-countries'
-                },
-            ],
-            title: 'Corona numbers'
+                }
+            ]
         }
     }
 }

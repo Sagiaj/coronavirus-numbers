@@ -1,13 +1,36 @@
-import { CountryTimeline, SeriesResults } from "~/src/models/timeline";
+import { CountryTimeline, LineSeries, ColumnSeries } from "~/src/models/timeline";
 import { Trie, TrieSearchResult } from "~/src/models/trie";
 
-export const transformTimelineToSeries = (_timeline: CountryTimeline, country: string): SeriesResults => {
+export const transformTimelineToSeries = (_timeline: CountryTimeline, country: string): LineSeries => {
   let countryFill = { ...(country ? {country} : {}) };
   let data = Object.keys(_timeline).reduce((ds: any, key) => ({ ...ds, 
     ...({ [key]: { data: Object.keys(_timeline[<keyof typeof _timeline>key]).map((date, i) => ({ date: date.slice(0, -3), [key]: _timeline[<keyof typeof _timeline>key][date] }) ) } }) 
   }), {});
   return { ...countryFill, ...data };
 };
+
+export const transformTimelineToGrowthSeries = (_timeline: CountryTimeline, country: string) => {
+  let countryFill = { ...(country ? {country} : {}) };
+  let growthSeries: any = {};
+  let properties = Object.keys(_timeline)
+  for (let property of properties) {
+    growthSeries[property] = {data: []};
+    let prevVal = 0;
+    let i = 0;
+    for (let date in _timeline[property]) {
+      if (i !== 0) {
+        growthSeries[property].data.push({ date: date.slice(0, -3), [property]: _timeline[property][date] - prevVal });
+      }
+      prevVal = _timeline[property][date];
+      i++;
+    }
+  }
+  return { ...countryFill, ...growthSeries };
+}
+
+export const groupSeriesByProp = (_lineSeries: LineSeries, prop: keyof CountryTimeline) => {
+  _lineSeries.data[prop]
+}
 
 export const transformTimelineToRateSeries = (_timeline: CountryTimeline, country: string) => {
   let dates = Object.keys(_timeline.cases);
@@ -18,7 +41,7 @@ export const transformTimelineToRateSeries = (_timeline: CountryTimeline, countr
   for (let i = 1; i < dates.length; i++) {
     let val = _timeline.cases[dates[i]];
     ratio = (parseInt("" + val) / parseInt("" + prevVal)) * 100;
-    rateSeries.data.push({date: dates[i], cases: Math.ceil((ratio / prevRatio) * 100 ) });
+    rateSeries.data.push({date: dates[i].slice(0, -3), cases: Math.ceil((ratio / prevRatio) * 100 ) });
     prevVal = val;
     prevRatio = ratio;
   }

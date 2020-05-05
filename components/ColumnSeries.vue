@@ -10,11 +10,10 @@
 </template>
 
 <script>
-import { ChartPlugin, ColumnSeries, Category } from '@syncfusion/ej2-charts'
+import { ColumnSeries, Category } from '@syncfusion/ej2-charts'
 
 export default {
   name: 'ColumnSeries',
-  components: { ChartPlugin },
   props: ["seriesArray", "labelFormat", "xName", "yName", "seriesType", "seriesTitle"],
   data() {
     return {

@@ -1,71 +1,61 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col cols="4">
-        <v-card style="max-height: 80vh; overflow-y: scroll;">
-          <v-container class="py-0">
-            <v-row
-              align="center"
-              justify="start"
+    <v-row justify="center">
+      
+      <v-col cols="12">
+        <v-autocomplete
+          v-model="countriesList"
+          :items="filteredCountries"
+          :loading="loadingData"
+          :search-input.sync="search"
+          cache-items
+          hide-no-data
+          filled
+          chips
+          color="blue-grey lighten-2"
+          label="Select countries to compare"
+          item-text="country"
+          item-value="name"
+          return-object
+          multiple
+          @focus="getCountriesData"
+        >
+          <template v-slot:selection="data">
+            <v-chip
+              v-bind="data.attrs"
+              :input-value="data.selected"
+              close
+              :disabled="loadingData"
+              @click:close="toggleCountry(data.item)"
             >
-              <v-col
-                v-for="(selection, i) in selections"
-                :key="selection.country"
-                class="shrink"
-              >
-                <v-chip
-                  :disabled="loadingData"
-                  close
-                  @click:close="selected.splice(i, 1); removeCountryFromChart(selection, i);"
-                >
-                  <v-avatar left v-if="selection && selection.countryInfo">
-                    <v-img :src="selection.countryInfo.flag"></v-img>
-                  </v-avatar>
-                  {{ selection.country }}
-                </v-chip>
-              </v-col>
-
-              <v-col v-if="!allSelected" cols="12">
-                <v-text-field
-                  ref="search"
-                  v-model="search"
-                  full-width
-                  hide-details
-                  label="Search"
-                  single-line
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
-
-          <v-divider v-if="!allSelected"></v-divider>
-
-          <v-list>
-            <template v-for="(item, i) in filteredCountries">
-              <v-list-item
-                v-if="!selected.includes(i)"
-                :key="i"
-                :disabled="loadingData"
-                @click="selected.push(i); addCountryToChart(item, i);"
-              >
-                <v-list-item-avatar>
-                  <v-avatar left v-if="item && item.countryInfo">
-                    <v-img :src="item.countryInfo.flag"></v-img>
-                  </v-avatar>
-                </v-list-item-avatar>
-                <v-list-item-title v-text="item.country"></v-list-item-title>
-              </v-list-item>
-            </template>
-          </v-list>
-        </v-card>        
+              <v-avatar left v-if="data.item && data.item.countryInfo">
+                <v-img :src="data.item.countryInfo.flag"></v-img>
+              </v-avatar>
+              {{ data.item.country }}
+            </v-chip>
+          </template>
+          <template v-slot:item="data" v-bind="data.attrs" :input-value="data.selected">
+            <v-list-item @click="toggleCountry(data.item);">
+              <v-list-item-avatar left v-if="data.item && data.item.countryInfo">
+                <v-img :src="data.item.countryInfo.flag"></v-img>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title> {{ data.item.country }} </v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </template>
+        </v-autocomplete>
       </v-col>
-      <v-col cols="8">
-        <!-- {{comparedCountries}} -->
-        <TimeSeries
+      <v-col cols="12">
+        <MultipleSeries
+          :providedSeries="comparedCountries.map(({country, ...all}) => ({ data: all, country }) )"
+
+        />
+        <!-- <TimeSeries
           :providedSeries="comparedCountries.map(({ country, ...series }) => series)"
           seriesTitle="Comparison chart"
           :externalIndicatorChoices="comparedCountries.map(c => Object.keys(c.country))"
-        />
+        /> -->
         <v-btn color="info" class="mt-3" @click.native="clearChart" v-if="selected.length > 1">
           <v-icon>mdi-delete</v-icon>
           <span>CLEAR ALL</span>
@@ -77,42 +67,62 @@
 
 <script>
 import { CoronaRoutes } from '../utilities/api';
-import TimeSeries from "~/components/TimeSeries";
+// import TimeSeries from "~/components/TimeSeries";
+import MultipleSeries from "~/components/MultipleSeries";
 import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToRateSeries } from "~/utilities/data-handlers";
 
 export default {
   name: "CompareCountries",
   components: {
-    TimeSeries
+    // TimeSeries,
+    MultipleSeries
+  },
+  watch: {
+    search(text) {
+      this.filterCountries(text);
+    }
   },
   computed: {
-    filteredCountries () {
-      return findWordsByPrefix(this.countriesTrie, this.search).map((v) => v.context);
-    },
-    selections () {
-      const selections = [];
+    // filteredCountries () {
+    //   if (this.countriesTrie.length > 1) return findWordsByPrefix(this.countriesTrie, this.search || "").map((v) => v.context);
+    //   return [];
+    // },
+    // selections () {
+    //   const selections = [];
 
-      for (const selection of this.selected) {
-        selections.push(this.countries[selection])
-      }
+    //   for (const selection of this.selected) {
+    //     selections.push(this.countries[selection])
+    //   }
 
-      return selections;
-    },
+    //   return selections;
+    // },
     allSelected () {
       return this.selected.length === this.countries.length;
     }
   },
   methods: {
+    doit(a,b,c) {
+      console.log(a,b,c)
+    },
+    filterCountries (text) {
+      if (this.countriesTrie !== null) {
+        this.filteredCountries = findWordsByPrefix(this.countriesTrie, text || "").map((v) => v.context);
+      }
+    },
     clearChart (event) {
       this.search = '';
       this.selected = [];
       this.comparedCountries = [];
     },
     async getCountriesData() {
+      if (this.countries.length > 0) {
+        return;
+      }
       this.startFetching();
       let { data: countries } = await this.$axios(CoronaRoutes.sortCountries());
       this.countriesTrie = parseStructureToTrie(countries, 'country');
       this.countries = countries;
+      this.filterCountries("");
       this.finishFetching();
     },
     async getCountryTimeline(country) {      
@@ -122,18 +132,26 @@ export default {
     removeTimeSeries(item, i) {
       this.comparedCountries.splice(i, 1);
     },
-    async addCountryToChart(country, idx) {
+    async toggleCountry(item) {
+      let { country } = item;
+      let idx = this.comparedCountries.findIndex((v) => v.country === country);
+      let listIdx = this.countriesList.findIndex(v => v.country === country);
+      if (idx > -1) {
+        this.removeCountryFromChart(idx);
+        this.countriesList.splice(listIdx, 1);
+      } else {
+        await this.addCountryToChart(item);
+        this.countriesList.splice(listIdx, 0, item);
+      }
+    },
+    async addCountryToChart(item) {
       this.startFetching();
-      const countryTimeline = await this.getCountryTimeline(country.country);
-      const series = transformTimelineToSeries(countryTimeline.timeline, country);
-      console.log("returning this series:", series);
-      // keys should be countries
-      // series[country].data = [{date: "/d..", prop: ""}]
-      // let rate = transformTimelineToRateSeries(countryTimeline, country.country);
-      this.comparedCountries.splice(idx, 0, series);
+      const countryTimeline = await this.getCountryTimeline(item.country);
+      const series = transformTimelineToSeries(countryTimeline.timeline, item.country);
+      this.comparedCountries.push(series);
       this.finishFetching();
     },
-    removeCountryFromChart(country, idx) {
+    removeCountryFromChart(idx) {
       this.comparedCountries.splice(idx, 1);
     },
     startFetching() {
@@ -155,19 +173,17 @@ export default {
       }
     }
   },
-  beforeMount() {
-     this.getCountriesData();
-  },
   data () {
     return {
       countries: [],
       comparedCountries: [],
+      filteredCountries: [],
       fetchersQueue: 0,
       loadingData: false,
       finishedLoading: true,
       countriesList: [],
       search: "",
-      countriesTrie: [],
+      countriesTrie: null,
       selected: [],
       comparisonModel: "",
       labelFormat: "y%"

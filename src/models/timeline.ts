@@ -1,3 +1,7 @@
+export interface DateValueRecord {
+  [date: string]: number;
+}
+
 export interface CountryHistoricalData {
   country: string;
   provinces: string[];
@@ -5,18 +9,26 @@ export interface CountryHistoricalData {
 }
 
 export interface CountryTimeline {
-  cases: Cases;
-  deaths: Cases;
-  recovered: Cases;
+  cases: TimelineProp;
+  deaths: TimelineProp;
+  recovered: TimelineProp;
+  [key: string]: any;
 }
 
-export interface Cases {
-  [key: string]: number;
+export interface TimelineProp {
+  [key: string]: { [key: string]: number }[];
 }
 
-export interface SeriesResults {
+export interface LineSeries {
   country: string;
-  cases: { data: Array<any> };
-  deaths: { data: Array<any> };
-  recovered: { data: Array<any> };
+  data: {
+    [P in keyof CountryTimeline]: DateValueRecord[]
+  }
+}
+
+export interface ColumnSeries {
+  country: string;
+  cases: Array<DateValueRecord>;
+  deaths: Array<DateValueRecord>;
+  recovered: Array<DateValueRecord>;
 }

@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <h2 class="py-6">{{ "Choose a parameter in " + seriesTitle }}</h2>
+    <h1 class="py-6">{{ seriesTitle }}</h1>
     <v-row justify="end">
       <v-col cols="12" sm="9" offset-sm="3">
         <v-row justify="center">
@@ -27,14 +27,14 @@
       <v-col cols="12" sm="3" align="start" align-self="center">
           <v-card flat>
             <v-card-title>
-              Choose chart type
+              View as
             </v-card-title>
             <v-card-text>
               <v-list>
                 <v-list-item-group v-model="graphStyleSelector">
                   <v-list-item color="deep-orange accent-3"
                     v-for="(graphStyle, key) in graphStyles"
-                    :key="key"
+                    :key="`${seriesTitle}-list-item-${key}`"
                   >
                     <v-list-item-content>
                       <v-list-item-title v-text="graphStyle.name"></v-list-item-title>
@@ -53,7 +53,7 @@
           <ejs-chart
             style="display:block"
             align="center"
-            id="chartcontainer"
+            :id="givenId"
             :title="seriesTitle"
             :primaryXAxis="primaryXAxis"
             :primaryYAxis="primaryYAxis"
@@ -63,7 +63,7 @@
             <e-series-collection v-if="seriesArray && seriesArray.length > 0">
               <e-series
                 v-for="(series, idx) in seriesArray"
-                :key="idx"
+                :key="`${seriesTitle}-series-${idx}`"
                 :dataSource="series.data"
                 :type="seriesType"
                 :xName="series.xName"
@@ -97,18 +97,17 @@ import {
   Category,
   Tooltip,
   Legend,
-  ChartPlugin,
   ColumnSeries
 } from '@syncfusion/ej2-vue-charts'
 
 export default {
   name: 'TimeSeries',
-  components: { ChartPlugin },
   props: [
     'providedSeries',
     'labelFormat',
     'providedSeriesType',
-    'seriesTitle'
+    'seriesTitle',
+    'givenId'
   ],
   watch: {
     graphStyleSelector(styleIdx, oldStyleIdx) {
@@ -116,26 +115,31 @@ export default {
       if (styleIdx === oldStyleIdx || styleIdx === undefined) return;
       this.seriesType = this.graphStyles[styleIdx].value;
     },
-    providedSeries() {
-      if (this.selectedIndicators < 1) this.selectedIndicators.push(this.indicatorChoices[0]);
-    },
     selectedIndicators() {
-      let arr = [];
-      for (let selector of this.selectedIndicators) {
-        let obj = { yName: selector };
-        let xName = Object.keys(this.providedSeries[selector].data[0])[0];
-        let data = this.providedSeries[selector];
-        if (xName) obj["xName"] = xName;
-        if (data) obj = { ...data, ...obj };
-        arr.push(obj);
+      try {
+        let arr = [];
+        for (let selector of this.selectedIndicators) {
+          let obj = { yName: selector };
+          let xName = (Object.keys(this.providedSeries[selector].data[0]) || ["date"])[0];
+          let data = this.providedSeries[selector];
+          if (xName) obj["xName"] = xName;
+          if (data) obj = { ...data, ...obj };
+          arr.push(obj);
+        }
+        this.seriesArray = arr.length > 0 ? arr : [];
+      } catch (err) {
+        console.log("Error in selectedindicators watch:", err, this.providedSeries);
       }
-      this.seriesArray = arr.length > 0 ? arr : [];
     }
   },
   computed: {
-    indicatorChoices() {      
+    indicatorChoices() {
       if (!this.providedSeries || this.providedSeries.length < 1) return [];
       let keys = Object.keys(this.providedSeries || {});
+      if (this.first == true) {
+        this.selectedIndicators.push(keys[0]);
+      }
+      this.first = false;
       return keys || [];
     }
   },
@@ -144,6 +148,7 @@ export default {
   },
   data() {
     return {
+      first: true,
       seriesArray: [],
       selectedIndicators: [],
       graphStyleSelector: 1,

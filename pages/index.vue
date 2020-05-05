@@ -5,55 +5,64 @@
         <logo class="mb-10" />
       </div>
     </v-row>
-    <MultipleColumnSeries />
-    <ColumnSeries
-      :seriesArray="globalSeries['cases']"
-      :seriesType="'Column'"
-      :seriesTitle="'Infection growth rate'"
-    />
-    <TimeSeries
-      :providedSeries="globalSeries"
-      seriesType="Line"
-      seriesTitle="Worldwide Coronavirus Statistics"
-    />
-    <GoogleAdsense :desktop="true" />
     <v-row justify="center" v-if="countries.length > 2">
+      <v-col cols="12" align="center">
+        <TimeSeries
+          :providedSeries="globalSeriesGrowth"
+          :givenId="`chartcontainer-1`"
+          seriesType="Line"
+          seriesTitle="Worldwide Coronavirus Infection Rate"
+        />
+      </v-col>
+      <v-col cols="12" align="center">
+        <TimeSeries
+          :providedSeries="globalSeries"
+          :givenId="`chartcontainer-2`"
+          seriesType="Line"
+          seriesTitle="Worldwide Coronavirus Statistics"
+        />
+      </v-col>
       <v-col align="center">
-        <v-card>
-          <v-row justify="space-around">
-            <v-col cols="6">
-              <h3 style="font-weight: 500;">Real time country statistics</h3>
-            </v-col>
-          </v-row>
-          <v-data-table
-            :headers="tableHeaders"
-            :items="tableItems"
-            :items-per-page="10"
-            class="elevation-3"
-            :search="search"
-            :custom-filter="filterTableCountry"
-            @click:row="goToCountryPage"
-          >
-            <template v-slot:top>
-              <v-text-field v-model="search" label="Search" class="mx-4"></v-text-field>
-            </template>
-            <template v-slot:item.cases="{ item }">
-              <v-chip :color="getColor(item.cases, 'cases')" dark>{{ item.cases }}</v-chip>
-            </template>
-            <template v-slot:item.testsPerOneMillion="{ item }">
-              <v-chip
-                :color="getReverseColor(item.testsPerOneMillion, 'testsPerOneMillion')"
-                dark
-              >{{ item.testsPerOneMillion }}</v-chip>
-            </template>
-            <template v-slot:item.casesPerOneMillion="{ item }">
-              <v-chip
-                :color="getColor(item.casesPerOneMillion, 'casesPerOneMillion')"
-                dark
-              >{{ item.casesPerOneMillion }}</v-chip>
-            </template>
-          </v-data-table>
-        </v-card>
+        <v-data-table
+          :headers="tableHeaders"
+          :items="tableItems"
+          :items-per-page="10"
+          class="elevation-3"
+          :search="search"
+          :custom-filter="filterTableCountry"
+          @click:row="goToCountryPage"
+        >
+          <template v-slot:top>
+            <v-row justify="space-around">
+              <v-col cols="6">
+                <h1 style="font-weight: 500;">Real time country statistics</h1>
+              </v-col>
+              <v-col cols="12">
+                <v-row justify="center">
+                  <v-col cols="12" sm="6" align="center">
+                    <v-text-field prepend-icon="mdi-magnify" color="deep-orange" v-model="search" label="Search" class="mx-4"></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-col>
+            </v-row>
+            <v-divider></v-divider>
+          </template>
+          <template v-slot:item.cases="{ item }">
+            <v-chip :color="getColor(item.cases, 'cases')" dark>{{ item.cases }}</v-chip>
+          </template>
+          <template v-slot:item.testsPerOneMillion="{ item }">
+            <v-chip
+              :color="getReverseColor(item.testsPerOneMillion, 'testsPerOneMillion')"
+              dark
+            >{{ item.testsPerOneMillion }}</v-chip>
+          </template>
+          <template v-slot:item.casesPerOneMillion="{ item }">
+            <v-chip
+              :color="getColor(item.casesPerOneMillion, 'casesPerOneMillion')"
+              dark
+            >{{ item.casesPerOneMillion }}</v-chip>
+          </template>
+        </v-data-table>
       </v-col>
     </v-row>
     <v-row class="mt-5" justify="center" v-else>
@@ -71,16 +80,12 @@ import Logo from '~/components/Logo.vue'
 import { CoronaRoutes } from '~/utilities/api'
 import GoogleAdsense from '~/components/GoogleAdsense'
 import TimeSeries from '~/components/TimeSeries'
-import ColumnSeries from "~/components/ColumnSeries";
-import MultipleColumnSeries from "~/components/MultipleColumnSeries";
-import { transformTimelineToSeries } from '../utilities/data-handlers'
+import { transformTimelineToSeries, transformTimelineToGrowthSeries } from '../utilities/data-handlers'
 
 export default {
   components: {
     Logo,
     GoogleAdsense,
-    ColumnSeries,
-    MultipleColumnSeries,
     TimeSeries
   },
   head() {
@@ -122,23 +127,26 @@ export default {
           countries.length
       )
       this.tableHeaders = Object.keys(this.displayableHeaders).map(h => ({
-        text: h.replace(/([A-Z])/g, ' $1'),
+        text: ((s) => s.charAt(0).toUpperCase() + s.slice(1))(h.replace(/([A-Z])/g, ' $1')),
         value: h,
         align: 'center'
-      }))
+      }));
       this.tableItems = this.countries.map(c =>
         Object.keys(this.displayableHeaders).reduce(
           (acc, h) => ({ ...acc, [h]: c[h] }),
           {}
         )
-      )
-      this.finishFetching()
+      );
+      this.finishFetching();
     },
     async getGlobalData() {
       this.startFetching()
       const { data: globalTimeline } = await this.$axios(CoronaRoutes.historical(this.currentHistoricalParam));
       const { country, ...series } = transformTimelineToSeries(globalTimeline, "Global");
+      const { country: c2, ...growthSeries } = transformTimelineToGrowthSeries(globalTimeline, "Global");
       this.globalSeries = series;
+      this.globalSeriesGrowth = growthSeries;
+      console.log("check both of them:", series, growthSeries);
       this.finishFetching()
     },
     timestampToDate(ts) {
@@ -186,6 +194,7 @@ export default {
     return {
       countries: [0],
       globalSeries: [],
+      globalSeriesGrowth: [],
       currentSortParam: 'cases',
       currentHistoricalParam: 'all',
       globalCasesDates: [],
