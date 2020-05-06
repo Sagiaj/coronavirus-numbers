@@ -2,7 +2,7 @@
   <v-container fluid>
     <v-row justify="center">
       
-      <v-col cols="12">
+      <v-col cols="8" align="center">
         <v-autocomplete
           v-model="countriesList"
           :items="filteredCountries"
@@ -10,7 +10,7 @@
           :search-input.sync="search"
           cache-items
           hide-no-data
-          filled
+          solo
           chips
           color="blue-grey lighten-2"
           label="Select countries to compare"
@@ -48,8 +48,8 @@
       </v-col>
       <v-col cols="12">
         <MultipleSeries
+          :givenId="'chartcontainer-1'"
           :providedSeries="comparedCountries.map(({country, ...all}) => ({ data: all, country }) )"
-
         />
         <!-- <TimeSeries
           :providedSeries="comparedCountries.map(({ country, ...series }) => series)"
@@ -69,7 +69,7 @@
 import { CoronaRoutes } from '../utilities/api';
 // import TimeSeries from "~/components/TimeSeries";
 import MultipleSeries from "~/components/MultipleSeries";
-import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToRateSeries } from "~/utilities/data-handlers";
+import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToGrowthSeries } from "~/utilities/data-handlers";
 
 export default {
   name: "CompareCountries",
@@ -147,7 +147,7 @@ export default {
     async addCountryToChart(item) {
       this.startFetching();
       const countryTimeline = await this.getCountryTimeline(item.country);
-      const series = transformTimelineToSeries(countryTimeline.timeline, item.country);
+      const series = transformTimelineToGrowthSeries(countryTimeline.timeline, item.country);
       this.comparedCountries.push(series);
       this.finishFetching();
     },

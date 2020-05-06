@@ -4,23 +4,39 @@
     <v-row justify="end">
       <v-col cols="12" sm="9" offset-sm="3">
         <v-row justify="center">
-          <v-col cols="6" align="center">
-            <v-autocomplete
+          <v-col cols="8" lg="12" align="center" v-if="selectedIndicators">
+            <!-- <v-autocomplete
               v-model="selectedIndicators"
               :items="indicatorChoices"
               dense
               chips
+              full-width
               :autofocus="false"
               small-chips
               label="Choose Stats"
               multiple
               clearable
-              solo
             >
               <template v-slot:item="data">
                 {{ data.item.charAt(0).toUpperCase() + data.item.slice(1).toLowerCase() }}
               </template>
-            </v-autocomplete>
+            </v-autocomplete> -->
+            <!-- <v-btn-toggle v-model="selectedIndicators" multiple color="deep-orange">
+              <v-btn text v-for="(choice, idx) in indicatorChoices" :key="`choice-${idx}`" class="mr-5"
+              >
+                {{ choice.charAt(0).toUpperCase() + choice.slice(1).toLowerCase() }}
+              </v-btn>
+            </v-btn-toggle> -->
+            <v-chip-group
+              v-model="selectedIndicators"
+              column
+              color="deep-orange"
+              multiple
+            >
+              <v-chip filter outlined v-for="(choice, idx) in indicatorChoices" :key="`choice-${idx}`">
+                {{ choice.charAt(0).toUpperCase() + choice.slice(1).toLowerCase() }}
+              </v-chip>
+            </v-chip-group>
           </v-col>
         </v-row>
       </v-col>
@@ -118,7 +134,7 @@ export default {
     selectedIndicators() {
       try {
         let arr = [];
-        for (let selector of this.selectedIndicators) {
+        for (let selector of this.selectedIndicators.map(indicator => this.indicatorChoices[indicator])) {
           let obj = { yName: selector };
           let xName = (Object.keys(this.providedSeries[selector].data[0]) || ["date"])[0];
           let data = this.providedSeries[selector];
@@ -137,7 +153,7 @@ export default {
       if (!this.providedSeries || this.providedSeries.length < 1) return [];
       let keys = Object.keys(this.providedSeries || {});
       if (this.first == true) {
-        this.selectedIndicators.push(keys[0]);
+        this.selectedIndicators.push(0);
       }
       this.first = false;
       return keys || [];

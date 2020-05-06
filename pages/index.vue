@@ -5,6 +5,20 @@
         <logo class="mb-10" />
       </div>
     </v-row>
+    <v-row class="mb-10" justify="center">
+      <v-col align="center" align-self="center">
+
+        REPLACE WITH MAP
+        <div id="map-wrap" style="height: 50vh; width: 80vw;">
+          <no-ssr>
+            <l-map :zoom="3" :center="[47.413220, -1.219482]">
+              <l-tile-layer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"></l-tile-layer>
+              <l-marker :lat-lng="[47.413220, -1.219482]"></l-marker>
+            </l-map>
+          </no-ssr>
+          </div>
+      </v-col>
+    </v-row>
     <v-row justify="center" v-if="countries.length > 2">
       <v-col cols="12" align="center">
         <TimeSeries
@@ -92,6 +106,15 @@ export default {
     return 'HAHA :D'
   },
   methods: {
+    zoomUpdated (zoom) {
+      this.zoom = zoom;
+    },
+    centerUpdated (center) {
+      this.center = center;
+    },
+    boundsUpdated (bounds) {
+      this.bounds = bounds;
+    },
     filterTableCountry(v, s, item) {
       return v !== null &&
       s !== null &&
@@ -146,7 +169,6 @@ export default {
       const { country: c2, ...growthSeries } = transformTimelineToGrowthSeries(globalTimeline, "Global");
       this.globalSeries = series;
       this.globalSeriesGrowth = growthSeries;
-      console.log("check both of them:", series, growthSeries);
       this.finishFetching()
     },
     timestampToDate(ts) {
@@ -192,6 +214,9 @@ export default {
   },
   data() {
     return {
+      zoom: 3,
+      center: [47.413220, -1.219482],
+      bounds: null,
       countries: [0],
       globalSeries: [],
       globalSeriesGrowth: [],

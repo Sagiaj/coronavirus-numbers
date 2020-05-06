@@ -38,7 +38,8 @@
             <v-col>
               <ejs-chart :title='title' :primaryXAxis='primaryXAxis' selectionMode='Point'
                 :primaryYAxis="primaryYAxis"
-                :tooltip="tooltip">
+                :tooltip="tooltip"
+                :id="givenId">
                 <e-series-collection v-if="selected && providedSeries">
                   <e-series
                   v-for="(serie, idx) in providedSeries"
@@ -65,7 +66,7 @@ import { transformLineSeriesToColumnSeries } from '../utilities/data-handlers';
 
 export default {
   name: 'MultipleSeries',
-  props: ["providedSeries", "labelFormat"],
+  props: ["providedSeries", "labelFormat", "givenId"],
   computed: {
     selectables() {
       if (!this.providedSeries) return [];

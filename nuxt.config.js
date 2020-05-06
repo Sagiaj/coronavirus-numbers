@@ -46,7 +46,9 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/pwa',
-    '@nuxtjs/google-adsense'
+    '@nuxtjs/google-adsense',
+    'nuxt-leaflet'
+
   ],
   /*
   ** Axios module configuration
