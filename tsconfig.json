@@ -26,8 +26,7 @@
     "types": [
       "@types/node",
       "@nuxt/types",
-      "@nuxtjs/vuetify",
-      "nuxt-leaflet"
+      "@nuxtjs/vuetify"
     ]
   },
   "include": [

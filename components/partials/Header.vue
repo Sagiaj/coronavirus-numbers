@@ -13,7 +13,7 @@
                 v-for="item in items"
                 :key="item.title"
                 :to="item.to">
-                <v-icon left dark>{{ item.icon }}</v-icon>
+                <v-icon left>{{ item.icon }}</v-icon>
                 {{ item.title }}
                 </v-btn>
             </v-toolbar-items>
@@ -34,8 +34,13 @@ export default {
                 },
                 {
                     icon: 'mdi-chart-bubble',
-                    title: 'Compare countries',
+                    title: 'Compare Countries',
                     to: '/compare-countries'
+                },
+                {
+                    icon: 'mdi-chart-bubble',
+                    title: 'Worldwide Statistics',
+                    to: '/worldwide-statistics'
                 }
             ]
         }

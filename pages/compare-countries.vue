@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row justify="center">
-      
+      <v-col cols="12"><h1>Compare Country Statistics</h1></v-col>
       <v-col cols="8" align="center">
         <v-autocomplete
           v-model="countriesList"
@@ -34,14 +34,17 @@
               {{ data.item.country }}
             </v-chip>
           </template>
-          <template v-slot:item="data" v-bind="data.attrs" :input-value="data.selected">
-            <v-list-item @click="toggleCountry(data.item);">
+          <template v-slot:item="data" v-bind="data.attrs" :input-value="data.attrs.inputValue">
+            <v-list-item :style="`${data.attrs.inputValue ? `background: #eee;` : ''}`" :class="data.attrs.activeClass" @click="toggleCountry(data.item);">
               <v-list-item-avatar left v-if="data.item && data.item.countryInfo">
                 <v-img :src="data.item.countryInfo.flag"></v-img>
               </v-list-item-avatar>
-              <v-list-item-content>
+              <v-list-item-content :class="data.attrs.inputValue ? data.attrs.activeClass : ''">
                 <v-list-item-title> {{ data.item.country }} </v-list-item-title>
               </v-list-item-content>
+              <v-list-item-icon v-if="data.attrs.inputValue">
+                <v-icon color="success">mdi-check</v-icon>
+              </v-list-item-icon>
             </v-list-item>
           </template>
         </v-autocomplete>

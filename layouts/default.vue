@@ -1,7 +1,7 @@
 <template>
-  <v-app dark>
+  <v-app>
     <Header />
-    <v-content style="background-color: #cecece;">
+    <v-content>
       <v-row justify="center">
         <v-col 
           cols="12"

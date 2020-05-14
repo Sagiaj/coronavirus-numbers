@@ -80,6 +80,7 @@ dist
 # js & .map files
 **/*.js
 **/*.map.js
+**/*.js.map
 
 # IDE / Editor
 .idea

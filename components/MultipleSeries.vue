@@ -4,7 +4,7 @@
         <v-col cols="12" sm="3" align="start" align-self="center">
           <v-card flat>
             <v-card-title>
-              View as
+              <h3>View as</h3>
             </v-card-title>
             <v-card-text>
               <v-list>
@@ -27,15 +27,14 @@
         </v-col>
         <v-col cols="12" sm="9" align-self="center">
           <v-row justify="center">
-            <v-col cols="12"><h3>Select a property</h3></v-col>
+            <v-col cols="12"><h2>Choose one stat</h2></v-col>
             <v-col :align="['end', 'center', 'start'][idx%3]" v-for="(selectable, idx) in selectables" :key="`selectable-${idx}`">
               <v-btn outlined color="deep-orange accent-3" text :input-value="selected === selectable" @click.native="selected = selectable;"
               >{{ selectable }}</v-btn>
             </v-col>
           </v-row>
-          <v-spacer></v-spacer>
-          <v-row>
-            <v-col>
+          <v-row justify="center">
+            <v-col align-self="center" align="center">
               <ejs-chart :title='title' :primaryXAxis='primaryXAxis' selectionMode='Point'
                 :primaryYAxis="primaryYAxis"
                 :tooltip="tooltip"
