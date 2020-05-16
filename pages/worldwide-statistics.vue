@@ -1,9 +1,10 @@
 <template>
   <v-container fluid>
-    <v-row justify="center" v-if="finishedLoading">
+    <v-row justify="center">
       <v-col cols="12" lg="6" align="center">
         <TimeSeries
           :providedSeries="globalSeriesGrowth"
+          :finishedLoading="finishedLoading"
           :givenId="`chartcontainer-1`"
           seriesType="Line"
           seriesTitle="Worldwide Coronavirus Daily Infections"
@@ -12,17 +13,11 @@
       <v-col cols="12" lg="6" align="center">
         <TimeSeries
           :providedSeries="globalSeries"
+          :finishedLoading="finishedLoading"
           :givenId="`chartcontainer-2`"
           seriesType="Line"
           seriesTitle="Worldwide Coronavirus Statistics"
         />
-      </v-col>
-    </v-row>
-    <v-row class="mt-5" justify="center" v-else>
-      <v-col align="center" class="mt-5">
-        <v-progress-circular color="info" size="200" indeterminate>
-          <h2>Loading...</h2>
-        </v-progress-circular>
       </v-col>
     </v-row>
   </v-container>

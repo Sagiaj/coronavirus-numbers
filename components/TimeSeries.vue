@@ -1,32 +1,10 @@
 <template>
   <v-card>
     <h1 class="py-6">{{ seriesTitle }}</h1>
-    <v-row justify="end">
+    <v-row justify="end" v-if="indicatorChoices && indicatorChoices.length > 0">
       <v-col cols="12" sm="9" offset-sm="3">
         <v-row justify="center">
           <v-col cols="8" lg="12" align="center" v-if="selectedIndicators">
-            <!-- <v-autocomplete
-              v-model="selectedIndicators"
-              :items="indicatorChoices"
-              dense
-              chips
-              full-width
-              :autofocus="false"
-              small-chips
-              label="Choose Stats"
-              multiple
-              clearable
-            >
-              <template v-slot:item="data">
-                {{ data.item.charAt(0).toUpperCase() + data.item.slice(1).toLowerCase() }}
-              </template>
-            </v-autocomplete> -->
-            <!-- <v-btn-toggle v-model="selectedIndicators" multiple color="deep-orange">
-              <v-btn text v-for="(choice, idx) in indicatorChoices" :key="`choice-${idx}`" class="mr-5"
-              >
-                {{ choice.charAt(0).toUpperCase() + choice.slice(1).toLowerCase() }}
-              </v-btn>
-            </v-btn-toggle> -->
             <v-chip-group
               v-model="selectedIndicators"
               column
@@ -104,6 +82,12 @@
         </v-card-text>
       </v-col>
     </v-row>
+    <v-boilerplate v-else
+      class="mb-6"
+      type="card-avatar"
+      :loading="true"
+      height="60vh"
+    ></v-boilerplate>
   </v-card>
 </template>
 
@@ -125,6 +109,22 @@ export default {
     'seriesTitle',
     'givenId'
   ],
+  components: {
+    VBoilerplate: {
+      functional: true,
+
+      render (h, { data, props, children }) {
+        return h('v-skeleton-loader', {
+          ...data,
+          props: {
+            boilerplate: true,
+            elevation: 2,
+            ...props,
+          },
+        }, children)
+      },
+    }
+  },
   watch: {
     graphStyleSelector(styleIdx, oldStyleIdx) {
       if (styleIdx === null) this.seriesArray = [];

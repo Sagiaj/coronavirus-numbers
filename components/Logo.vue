@@ -5,6 +5,7 @@
     <div class="Triangle Triangle--three" />
     <div class="Triangle Triangle--four" /> -->
     <img
+      :style="`max-height: ${$vuetify.breakpoint.smAndUp ? 'auto' : '100px'};`"
       class="Virus"
       alt="Virus"
       src="/virus.svg"

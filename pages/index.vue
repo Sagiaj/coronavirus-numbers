@@ -2,23 +2,13 @@
   <v-container fluid>
     <v-row class="pb-5" justify="center">
       <div class="text-center">
-        <logo class="mb-5" />
+        <logo />
       </div>
     </v-row>
     <v-row class="mb-10" justify="start">
-      <v-col cols="12" lg="8" align="center" align-self="center" v-if="countries.length > 2">
-        <div v-if="circles.length < 1">
-          <v-boilerplate
-            class="mb-6"
-            type="card-avatar, article, actions"
-          ></v-boilerplate>
-
-          <v-boilerplate type="date-picker"></v-boilerplate>
-        </div>
+      <v-col cols="12" lg="8" align="center" align-self="center">
         <CountriesMap
-        :circles="circles"
-        v-else />
-        
+        :circles="circles"/>
       </v-col>
       <v-col cols="12" lg="4" align="start" align-self="center">
         <v-card>
@@ -82,14 +72,16 @@ export default {
   },
   computed: {
     circles() {
+      if (!this.countries || this.countries.length < 1) return [];
       return this.countries.map(country => {
-        if (country && country.countryInfo && country.countryInfo.lat && country.countryInfo.long) {}
+        if (country && country.countryInfo && country.countryInfo.lat && country.countryInfo.long) {
           return {
             radius: country.cases,
             lat: country.countryInfo.lat,
             long: country.countryInfo.long,
             country
           }
+        }
       })
     }
   },
