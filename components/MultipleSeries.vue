@@ -28,7 +28,7 @@
         <v-col cols="12" sm="9" align-self="center">
           <v-row justify="center">
             <v-col cols="12"><h2>Choose one stat</h2></v-col>
-            <v-col :align="['end', 'center', 'start'][idx%3]" v-for="(selectable, idx) in selectables" :key="`selectable-${idx}`">
+            <v-col :align="$vuetify.breakpoint.smAndDown ? 'center' : ['end', 'center', 'start'][idx%3]" v-for="(selectable, idx) in selectables" :key="`selectable-${idx}`">
               <v-btn outlined color="deep-orange accent-3" text :input-value="selected === selectable" @click.native="selected = selectable;"
               >{{ selectable }}</v-btn>
             </v-col>

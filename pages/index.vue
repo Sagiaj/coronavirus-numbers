@@ -42,13 +42,6 @@
         />
       </v-col>
     </v-row>
-    <!-- <v-row class="mt-5" justify="center" v-else>
-      <v-col align="center" class="mt-5">
-        <v-progress-circular color="info" size="200" indeterminate>
-          <h2>Loading...</h2>
-        </v-progress-circular>
-      </v-col>
-    </v-row> -->
   </v-container>
 </template>
 

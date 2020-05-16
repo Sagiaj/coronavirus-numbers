@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="3">
+      <v-col cols="12" sm="9" md="6">
         <h1>{{ currentCountry }} Coronavirus Numbers</h1>
         <v-row justify="center">
           <v-col cols="6" align-self="center">
