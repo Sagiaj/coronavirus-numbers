@@ -8,17 +8,12 @@
     <v-row class="mb-10" justify="start">
       <v-col cols="12" lg="8" align="center" align-self="center">
         <v-card>
-          <!-- <CountriesMap
-          :circles="circles"/> -->
+          <CountriesMap
+          :circles="circles"/>
         </v-card>
       </v-col>
+      <GoogleAdsense />
       <v-col cols="12" lg="4" align="start" align-self="center">
-        <v-boilerplate
-          class="mb-6"
-          type="heading, list, list-item-avatar, text@2, list-item-avatar, text@2, list-item-avatar, text@2, actions"
-          :loading="true"
-          height="60vh"
-        ></v-boilerplate>
         <v-card v-if="newsFeed && newsFeed.length">
           <v-card-title>
             <h2>Recent News</h2>
@@ -30,20 +25,16 @@
                   <v-timeline-item v-for="(feed, idx) in newsFeed" :key="`timeline-${idx}`" small>
                     <v-row justify="space-between">
                       <v-col cols="12">
-                        <v-col cols="12">
-                          {{ feed.title }}
-                        </v-col>
-                        <v-col cols="12">
-                          {{ feed.description ? feed.description.slice(0, 20) : '' }}
-                        </v-col>
-                        <!-- <v-expansion-panel>
-                          <v-expansion-panel-header>
-                            {{ feed.title }}
-                          </v-expansion-panel-header>
-                          <v-expansion-panel-content>
-                            {{ feed.description }}
-                          </v-expansion-panel-content>
-                        </v-expansion-panel> -->
+                        <h2>{{ feed.title }}</h2>
+                      </v-col>
+                      <v-col cols="8">
+                        {{ feed.description }}
+                      </v-col>
+                      <v-col cols="4">
+                        <v-btn color="primary" outlined text :href="feed.url">
+                          <span>Read more</span>
+                          <v-icon>mdi-arrow-right</v-icon>
+                        </v-btn>
                       </v-col>
                     </v-row>
                   </v-timeline-item>
@@ -54,7 +45,7 @@
         </v-card>
         <v-boilerplate v-else
           class="mb-6"
-          type="heading, v-divider, card, list, list-item-avatar"
+          type="heading, list, list-item-avatar, text@2, list-item-avatar, text@2, list-item-avatar, text@2, actions"
           :loading="true"
           height="60vh"
         ></v-boilerplate>

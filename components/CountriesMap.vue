@@ -22,16 +22,39 @@
       transition="fade-transition"
       height="100%"
     ></v-boilerplate>
-    <v-dialog v-model="openDialog" color="red">
+    <v-dialog v-model="openDialog" color="red" v-if="calledCountry !== null" max-width="50vw">
       <v-lazy v-model="calledCountry" transition="slide-y-transition" group>
         <transition name="slide-y-transition" mode="out-in">
           <v-card>
             <v-card-title primary-title>
-              <h2>Overall Cases</h2>
+              <h2>{{ calledCountry.country.country }}</h2>
             </v-card-title>
-            <v-card-text>
-              cases::: {{ calledCountry }}
+            <v-card-text v-if="calledCountry">
+              <v-row justify="space-between">
+                <v-col cols="8" align="start"> <h3>Active:</h3> </v-col>
+                <v-col cols="4" align="end"> <strong>{{ calledCountry.country.active }}</strong> </v-col>
+              </v-row>
+              <v-row justify="space-between">
+                <v-col cols="8" align="start"> <h3>Recovered:</h3> </v-col>
+                <v-col cols="4" align="end"> <strong>{{ calledCountry.country.recovered }}</strong> </v-col>
+              </v-row>
+              <v-row justify="space-between">
+                <v-col cols="8" align="start"> <h3>Deaths:</h3> </v-col>
+                <v-col cols="4" align="end"> <strong>{{ calledCountry.country.deaths }}</strong> </v-col>
+              </v-row>
+              <v-row justify="space-between">
+                <v-col cols="8" align="start"> <h3>Critical:</h3> </v-col>
+                <v-col cols="4" align="end"> <strong>{{ calledCountry.country.critical }}</strong> </v-col>
+              </v-row>
             </v-card-text>
+            <v-btn @click="openDialog = false; calledCountry = null;" icon absolute right top color="secondary">
+              <v-icon>mdi-close</v-icon>
+            </v-btn>
+            <v-card-actions>
+              <v-btn @click="openDialog = false; calledCountry = null;" outlined color="primary">
+                Cancel
+              </v-btn>
+            </v-card-actions>
           </v-card>
         </transition>
       </v-lazy>

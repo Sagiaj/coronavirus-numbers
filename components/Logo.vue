@@ -72,9 +72,8 @@
   transform: rotateZ(180deg);
   position: relative;
   overflow: hidden;
-  top: 20%;
-  height: 180px;
-  width: 245px;
+  height: 100px;
+  width: 140px;
 }
 /* 
 .Triangle {
@@ -137,8 +136,8 @@
 }
 */
 .Virus {
-  height:180px;
-  width: 180px;
+  height:120px;
+  width: 120px;
   transform: rotateY(560deg);
   animation: turn 3.5s ease-out forwards 1s;
 }

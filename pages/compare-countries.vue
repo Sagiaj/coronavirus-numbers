@@ -54,11 +54,6 @@
           :givenId="'chartcontainer-1'"
           :providedSeries="comparedCountries.map(({country, ...all}) => ({ data: all, country }) )"
         />
-        <!-- <TimeSeries
-          :providedSeries="comparedCountries.map(({ country, ...series }) => series)"
-          seriesTitle="Comparison chart"
-          :externalIndicatorChoices="comparedCountries.map(c => Object.keys(c.country))"
-        /> -->
         <v-btn color="info" class="mt-3" @click.native="clearChart" v-if="selected.length > 1">
           <v-icon>mdi-delete</v-icon>
           <span>CLEAR ALL</span>
@@ -70,14 +65,14 @@
 
 <script>
 import { CoronaRoutes } from '../utilities/api';
-// import TimeSeries from "~/components/TimeSeries";
+import GoogleAdsense from '~/components/GoogleAdsense';
 import MultipleSeries from "~/components/MultipleSeries";
 import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToGrowthSeries } from "~/utilities/data-handlers";
 
 export default {
   name: "CompareCountries",
   components: {
-    // TimeSeries,
+    GoogleAdsense,
     MultipleSeries
   },
   watch: {
