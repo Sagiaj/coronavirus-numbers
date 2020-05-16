@@ -1,32 +1,26 @@
 <template>
     <div>
-        <span>
-            <v-app-bar app>
-                <span v-if="$vuetify.breakpoint.mdAndUp">
-                    <v-toolbar-title>
-                        <nuxt-link to="/" tag="span" style="cursor: pointer">
-                            <v-icon>mdi-home</v-icon>
-                        </nuxt-link>
-                    </v-toolbar-title>
-                    <v-spacer />
-                    <v-toolbar-items>
-                        <v-btn
-                        text
-                        v-for="item in items"
-                        :key="item.title"
-                        :to="item.to">
-                        <v-icon left>{{ item.icon }}</v-icon>
-                        {{ item.title }}
-                        </v-btn>
-                    </v-toolbar-items>
-                </span>
-                <span v-else>
-                    <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-                </span>
-            </v-app-bar>
-        </span>
-        <span v-if="$vuetify.breakpoint.smAndDown">
-            <v-navigation-drawer app
+        <v-app-bar app>
+            <v-toolbar-title v-if="breakpoint.mdAndUp">
+                <nuxt-link to="/" tag="span" style="cursor: pointer">
+                    <v-icon>mdi-home</v-icon>
+                </nuxt-link>
+            </v-toolbar-title>
+            <v-spacer v-if="breakpoint.mdAndUp"/>
+            <v-toolbar-items v-if="breakpoint.mdAndUp">
+                <v-btn
+                text
+                v-for="item in items"
+                :key="item.title"
+                :to="item.to">
+                    <v-icon left>{{ item.icon }}</v-icon>
+                    {{ item.title }}
+                </v-btn>
+            </v-toolbar-items>
+            <v-app-bar-nav-icon v-if="!breakpoint.mdAndUp" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+        </v-app-bar>
+        <span v-if="breakpoint.smAndDown">
+            <v-navigation-drawer
             v-model="drawer"
             absolute
             left
@@ -67,8 +61,38 @@ export default {
             this.drawer = false
         }
     },
+    computed: {
+        breakpoint() {
+            return this.hydrated
+            ? this.$vuetify.breakpoint
+            : {
+                lg: false,
+                lgAndDown: false,
+                lgAndUp: false,
+                lgOnly: false,
+                md: false,
+                mdAndDown: false,
+                mdAndUp: false,
+                mdOnly: false,
+                name: false,
+                sm: false,
+                smAndDown: false,
+                smAndUp: false,
+                smOnly: false,
+                width: false,
+                xl: false,
+                xlOnly: false,
+                xs: false,
+                xsOnly: false
+            };
+        }
+    },
+    mounted() {
+        this.hydrated = true;
+    },
     data () {
         return {
+            hydrated: false,
             drawer: false,
             group: null,
             items: [

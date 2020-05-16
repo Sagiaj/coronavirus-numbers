@@ -7,11 +7,19 @@
     </v-row>
     <v-row class="mb-10" justify="start">
       <v-col cols="12" lg="8" align="center" align-self="center">
-        <CountriesMap
-        :circles="circles"/>
+        <v-card>
+          <!-- <CountriesMap
+          :circles="circles"/> -->
+        </v-card>
       </v-col>
       <v-col cols="12" lg="4" align="start" align-self="center">
-        <v-card>
+        <v-boilerplate
+          class="mb-6"
+          type="heading, list, list-item-avatar, text@2, list-item-avatar, text@2, list-item-avatar, text@2, actions"
+          :loading="true"
+          height="60vh"
+        ></v-boilerplate>
+        <v-card v-if="newsFeed && newsFeed.length">
           <v-card-title>
             <h2>Recent News</h2>
           </v-card-title>
@@ -21,8 +29,22 @@
                 <v-slide-x-transition group>
                   <v-timeline-item v-for="(feed, idx) in newsFeed" :key="`timeline-${idx}`" small>
                     <v-row justify="space-between">
-                      <v-col cols="7" v-text="feed.title"></v-col>
-                      <v-col cols="5" class="text-right" v-text="feed.description.slice(0, 20)"></v-col>
+                      <v-col cols="12">
+                        <v-col cols="12">
+                          {{ feed.title }}
+                        </v-col>
+                        <v-col cols="12">
+                          {{ feed.description ? feed.description.slice(0, 20) : '' }}
+                        </v-col>
+                        <!-- <v-expansion-panel>
+                          <v-expansion-panel-header>
+                            {{ feed.title }}
+                          </v-expansion-panel-header>
+                          <v-expansion-panel-content>
+                            {{ feed.description }}
+                          </v-expansion-panel-content>
+                        </v-expansion-panel> -->
+                      </v-col>
                     </v-row>
                   </v-timeline-item>
                 </v-slide-x-transition>
@@ -30,6 +52,12 @@
             </v-container>
           </v-card-text>
         </v-card>
+        <v-boilerplate v-else
+          class="mb-6"
+          type="heading, v-divider, card, list, list-item-avatar"
+          :loading="true"
+          height="60vh"
+        ></v-boilerplate>
       </v-col>
     </v-row>
     <v-row justify="center">
@@ -61,7 +89,21 @@ export default {
     GoogleAdsense,
     TimeSeries,
     CountriesMap,
-    CountriesTable
+    CountriesTable,
+    VBoilerplate: {
+      functional: true,
+
+      render (h, { data, props, children }) {
+        return h('v-skeleton-loader', {
+          ...data,
+          props: {
+            boilerplate: true,
+            elevation: 2,
+            ...props,
+          },
+        }, children)
+      },
+    }
   },
   computed: {
     circles() {

@@ -52,9 +52,11 @@
         >{{ item.casesPerOneMillion }}</v-chip>
       </template>
     </v-data-table>
-    <v-boilerplate v-else>
-
-    </v-boilerplate>
+    <v-boilerplate v-else
+      type="table"
+      :loading="true"
+      transition="fade-transition"
+    ></v-boilerplate>
   </div>
 </template>
 
