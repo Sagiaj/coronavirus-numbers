@@ -41,7 +41,6 @@
                   :circles="circles"/>
                 </v-card>
               </v-col>
-              <GoogleAdsense />
               <v-col cols="12" md="6" lg="5" xl="4" align="start" align-self="center">
                 <v-card v-if="newsFeed && newsFeed.length">
                   <v-card-title>
@@ -94,6 +93,7 @@
         </v-card>
       </v-tab-item>
     </v-tabs>
+    <GoogleAdsense />
     <v-row justify="center">
       <v-col align="center">
         <CountriesTable
