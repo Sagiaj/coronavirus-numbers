@@ -5,52 +5,95 @@
         <logo />
       </div>
     </v-row>
-    <v-row class="mb-10" justify="start">
-      <v-col cols="12" lg="8" align="center" align-self="center">
-        <v-card>
-          <CountriesMap
-          :circles="circles"/>
-        </v-card>
-      </v-col>
-      <GoogleAdsense />
-      <v-col cols="12" lg="4" align="start" align-self="center">
-        <v-card v-if="newsFeed && newsFeed.length">
-          <v-card-title>
-            <h2>Recent News</h2>
-          </v-card-title>
+    <v-tabs
+      v-model="tabs"
+      grow
+      centered
+      elevation="3"
+      color="primary"
+      slider-color="primary"
+    >
+      <v-tabs-slider></v-tabs-slider>
+      <v-tab ripple>
+        Compare Countries
+      </v-tab>
+      <v-tab ripple>
+        Interactive Map & Recent News
+      </v-tab>
+      <v-tab ripple>
+        Worldwide Statistics
+      </v-tab>
+
+      <v-tab-item>
+        <v-card flat>
           <v-card-text>
-            <v-container style="max-height: 55vh;" class="overflow-y-auto">
-              <v-timeline dense clipped>
-                <v-slide-x-transition group>
-                  <v-timeline-item v-for="(feed, idx) in newsFeed" :key="`timeline-${idx}`" small>
-                    <v-row justify="space-between">
-                      <v-col cols="12">
-                        <h2>{{ feed.title }}</h2>
-                      </v-col>
-                      <v-col cols="8">
-                        {{ feed.description }}
-                      </v-col>
-                      <v-col cols="4">
-                        <v-btn color="primary" outlined text :href="feed.url">
-                          <span>Read more</span>
-                          <v-icon>mdi-arrow-right</v-icon>
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                  </v-timeline-item>
-                </v-slide-x-transition>
-              </v-timeline>
-            </v-container>
+            <CompareCountries />
           </v-card-text>
         </v-card>
-        <v-boilerplate v-else
-          class="mb-6"
-          type="heading, list, list-item-avatar, text@2, list-item-avatar, text@2, list-item-avatar, text@2, actions"
-          :loading="true"
-          height="60vh"
-        ></v-boilerplate>
-      </v-col>
-    </v-row>
+      </v-tab-item>
+      <v-tab-item>
+        <v-card flat>
+          <v-card-text>
+            <v-row class="mb-10" justify="start">
+              <v-col cols="12" md="6" lg="7" xl="8" align="center" align-self="center">
+                <v-card>
+                  <CountriesMap
+                  :circles="circles"/>
+                </v-card>
+              </v-col>
+              <GoogleAdsense />
+              <v-col cols="12" md="6" lg="5" xl="4" align="start" align-self="center">
+                <v-card v-if="newsFeed && newsFeed.length">
+                  <v-card-title>
+                    <h2>Recent News</h2>
+                  </v-card-title>
+                  <v-card-text>
+                    <v-container style="max-height: 55vh;" class="overflow-y-auto">
+                      <v-timeline dense clipped>
+                        <v-slide-x-transition group>
+                          <v-timeline-item v-for="(feed, idx) in newsFeed" :key="`timeline-${idx}`" small>
+                            <v-row justify="space-between">
+                              <v-col cols="12">
+                                <h2><q>{{ feed.title ? feed.title.slice(0, 30) : '' }}...</q></h2>
+                                <h4>{{ feed.source.name }}</h4>
+                              </v-col>
+                              <v-col cols="8">
+                                <blockquote :cite="feed.url">
+                                  {{ feed.description ? feed.description.slice(0, 80) : '' }}...
+                                </blockquote>
+                              </v-col>
+                              <v-col cols="4">
+                                <v-btn color="primary" text small :href="feed.url">
+                                  <span>Read more</span>
+                                  <v-icon>mdi-arrow-right</v-icon>
+                                </v-btn>
+                              </v-col>
+                            </v-row>
+                          </v-timeline-item>
+                        </v-slide-x-transition>
+                      </v-timeline>
+                    </v-container>
+                  </v-card-text>
+                </v-card>
+                <v-boilerplate v-else
+                  class="mb-6"
+                  type="heading, list, list-item-avatar, text@2, list-item-avatar, text@2, list-item-avatar, text@2, actions"
+                  :loading="true"
+                  height="60vh"
+                ></v-boilerplate>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-tab-item>
+      <v-tab-item>
+        <v-card flat>
+          <v-card-text>
+            <WorldwideStatistics />
+          </v-card-text>
+        </v-card>
+      </v-tab-item>
+    </v-tabs>
     <v-row justify="center">
       <v-col align="center">
         <CountriesTable
@@ -69,9 +112,11 @@ import Logo from '~/components/Logo.vue'
 import { CoronaRoutes } from '~/utilities/api'
 import GoogleAdsense from '~/components/GoogleAdsense'
 import TimeSeries from '~/components/TimeSeries'
-import { transformTimelineToSeries, transformTimelineToGrowthSeries } from '../utilities/data-handlers'
+import { transformTimelineToSeries, transformTimelineToGrowthSeries } from '~/utilities/data-handlers'
 import CountriesMap from "~/components/CountriesMap";
 import CountriesTable from "~/components/CountriesTable";
+import CompareCountries from "~/components/PageComponents/CompareCountries";
+import WorldwideStatistics from "~/components/PageComponents/WorldwideStatistics";
 
 export default {
   inject: ['theme'],
@@ -81,6 +126,9 @@ export default {
     TimeSeries,
     CountriesMap,
     CountriesTable,
+    WorldwideStatistics,
+    CompareCountries,
+
     VBoilerplate: {
       functional: true,
 
@@ -173,6 +221,7 @@ export default {
   },
   data() {
     return {
+      tabs: null,
       newsFeed: null,
       countries: [0],
       calledCountry: null,

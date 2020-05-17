@@ -64,7 +64,7 @@
 </template>
 
 <script>
-import { CoronaRoutes } from '../utilities/api';
+import { CoronaRoutes } from '~/utilities/api';
 import GoogleAdsense from '~/components/GoogleAdsense';
 import MultipleSeries from "~/components/MultipleSeries";
 import { transformTimelineToSeries, parseStructureToTrie, findWordsByPrefix, transformTimelineToGrowthSeries } from "~/utilities/data-handlers";

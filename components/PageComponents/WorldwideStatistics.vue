@@ -27,7 +27,7 @@
 import { CoronaRoutes } from '~/utilities/api'
 import GoogleAdsense from '~/components/GoogleAdsense'
 import TimeSeries from '~/components/TimeSeries'
-import { transformTimelineToSeries, transformTimelineToGrowthSeries } from '../utilities/data-handlers'
+import { transformTimelineToSeries, transformTimelineToGrowthSeries } from "../../utilities/data-handlers";
 
 export default {
   name: "WorldwideStatistics",

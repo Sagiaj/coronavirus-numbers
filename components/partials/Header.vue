@@ -36,7 +36,7 @@
 
                     <v-list-item link>
                         <v-list-item-content>
-                            <v-list-item-title class="title">COVID-19 Numbers</v-list-item-title>
+                            <v-list-item-title class="title">Coronavirus Numbers</v-list-item-title>
                             <v-list-item-subtitle>Varied statistics on coronavirus</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
@@ -100,16 +100,6 @@ export default {
                     icon: 'mdi-chart-bubble',
                     title: 'Corona numbers',
                     to: '/'
-                },
-                {
-                    icon: 'mdi-chart-bubble',
-                    title: 'Compare Countries',
-                    to: '/compare-countries'
-                },
-                {
-                    icon: 'mdi-chart-bubble',
-                    title: 'Worldwide Statistics',
-                    to: '/worldwide-statistics'
                 }
             ]
         }
